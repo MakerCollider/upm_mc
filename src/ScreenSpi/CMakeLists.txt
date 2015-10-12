@@ -1,0 +1,5 @@
+set (libname "screenSpi9225")
+set (libdescription "UPM for ILI9225 SPI Screen")
+set (module_src ${libname}.cxx)
+set (module_h ${libname}.h)
+upm_module_init()
