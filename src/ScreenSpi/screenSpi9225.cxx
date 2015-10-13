@@ -8,12 +8,16 @@
 
 #include "screenSpi9225.h"
 
+using namespace cv;
 using namespace mraa;
 using namespace upm;
 using namespace std;
 
 #define HIGH 1
 #define LOW 0
+
+#define FACE_WIDTH 100
+#define FACE_HEIGHT 100
 
 #define WIDTH 176
 #define HEIGHT 220
@@ -54,6 +58,14 @@ ScreenSpi9225::ScreenSpi9225(int cs, int rs, int rst){
         delete gSPI;
 	}
 	memset(gFB,0,sizeof(uint16_t)*WIDTH*HEIGHT);
+        cv::Mat image;
+        image = imread("./smile.bmp");
+        cvtColor( image, smileImg, COLOR_BGR2BGR565 );
+        image = imread("./angry.bmp");                          
+        cvtColor( image, angryImg, COLOR_BGR2BGR565 ); 
+        image = imread("./normal.bmp");                          
+        cvtColor( image, normalImg, COLOR_BGR2BGR565 ); 
+
         cout<<"init finished!";
 }
 ScreenSpi9225::~ScreenSpi9225(){
@@ -206,18 +218,33 @@ void ScreenSpi9225::ILI9225GclearScreen(unsigned short color) {
 
 }
 
-void ScreenSpi9225::ILI9225GfillRect(int16_t x, int16_t y, int16_t w, int16_t h,uint16_t color)
+void ScreenSpi9225::ILI9225GfillRect(int faceId)
 {
-	int len = w*h;
-	int i=0;
-	memset(gFB,0,gFBSize);
-	for(i=0;i<len;i++)
-	{
-		uint8_t * p = (uint8_t*)(&gFB[i]);
-		p[0] = color>>8;
-		p[1] = color & 0xff;
-	
-    }
+	int x = (WIDTH-FACE_WIDTH)/2;                                                                               
+        int y = (HEIGHT-FACE_HEIGHT)/2;                                                                             
+        int w = FACE_WIDTH;                                                                                         
+        int h = FACE_HEIGHT;                                                                                        
+        int len = FACE_WIDTH*FACE_HEIGHT;                                                                           
+        int i=0;                                                                                                    
+        uint16_t tempBuf[len];
+        memset(gFB, 0, gFBSize);
+        if(faceId == 0)
+        {
+            memcpy(gFB, angryImg.data, len*sizeof(uint16_t));         
+        } else if (faceId == 1)
+        {
+            memcpy(gFB, smileImg.data, len*sizeof(uint16_t));
+        } else if (faceId == 2)
+        {
+            memcpy(gFB, normalImg.data, len*sizeof(uint16_t));
+        }                                                                  
+        for(i=0;i<len;i++)                                                                                          
+        {                                                                                                           
+                uint8_t * p = (uint8_t*)(&gFB[i]);                                                                  
+                p[0] = color>>8;                                                                                    
+                p[1] = color & 0xff;                                                                                
+                                                                                                                    
+        }         
 	ILI9225GflashBuffer(x,y, w,h,gFB,len*sizeof(uint16_t));
 }
 void ScreenSpi9225::ILI9225GflashBuffer(int16_t x, int16_t y, 

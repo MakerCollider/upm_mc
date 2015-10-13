@@ -12,6 +12,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <iostream>
+#include "opencv2/core/core.hpp"
+#include "opencv2/objdetect/objdetect.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
 #include "mraa.hpp"
 
 
@@ -32,7 +36,7 @@ namespace upm
     {
     public:
         void ILI9225GclearScreen(unsigned short color);
-        void ILI9225GfillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
+        void ILI9225GfillRect(int faceId);
         void ILI9225GflashBuffer(int16_t x, int16_t y, 
                                  int16_t w, int16_t h,
                                  unsigned short * rectbuffer,
@@ -52,7 +56,9 @@ namespace upm
         void writeRegister(unsigned short wr_cmd_a);
         void initializeLCD();
         void delay(unsigned long t);
-
+        cv::Mat smileImg;
+        cv::Mat angryImg;
+        cv::Mat normalImg;
     public:
         ScreenSpi9225(int cs, int rs, int rst);
         ~ScreenSpi9225();
