@@ -39,7 +39,7 @@ namespace upm
         void ILI9225GfillRect(int faceId);
         void ILI9225GflashBuffer(int16_t x, int16_t y, 
                                  int16_t w, int16_t h,
-                                 unsigned short * rectbuffer,
+                                 uint16_t* rectbuffer,
                                  int length);
 
     private:
@@ -48,6 +48,7 @@ namespace upm
         mraa::Gpio* gRST;
         mraa::Spi* gSPI;
         uint16_t *gFB;
+        uint16_t *imagePtr[3];
         unsigned long gFBSize;
         void mraa_error(mraa_result_t error_code);
         void writeCommand(unsigned short wr_cmd_a, unsigned short wr_cmd_b);
@@ -56,6 +57,7 @@ namespace upm
         void writeRegister(unsigned short wr_cmd_a);
         void initializeLCD();
         void delay(unsigned long t);
+	void image2flow(cv::Mat& in_image, uint16_t* in_str);
         cv::Mat smileImg;
         cv::Mat angryImg;
         cv::Mat normalImg;

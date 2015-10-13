@@ -7,7 +7,6 @@
 
 
 #include "screenSpi9225.h"
-
 using namespace cv;
 using namespace mraa;
 using namespace upm;
@@ -58,15 +57,18 @@ ScreenSpi9225::ScreenSpi9225(int cs, int rs, int rst){
         delete gSPI;
 	}
 	memset(gFB,0,sizeof(uint16_t)*WIDTH*HEIGHT);
-        cv::Mat image;
-        image = imread("./smile.bmp");
-        cvtColor( image, smileImg, COLOR_BGR2BGR565 );
-        image = imread("./angry.bmp");                          
-        cvtColor( image, angryImg, COLOR_BGR2BGR565 ); 
-        image = imread("./normal.bmp");                          
-        cvtColor( image, normalImg, COLOR_BGR2BGR565 ); 
+    cv::Mat image;
+    image = imread("/usr/share/SmartNode/resource/smile.bmp");
+    imagePtr[0] = new uint16_t[image.rows*image.cols];
+    image2flow(image, imagePtr[0]);
+    image = imread("/usr/share/SmartNode/resource/angry.bmp");                          
+    imagePtr[1] = new uint16_t[image.rows*image.cols];
+    image2flow(image, imagePtr[1]);
+    image = imread("/usr/share/SmartNode/resource/normal.bmp");                          
+    imagePtr[2] = new uint16_t[image.rows*image.cols]; 
+    image2flow(image, imagePtr[2]);
 
-        cout<<"init finished!";
+    cout << "init finished!" << endl;
 }
 ScreenSpi9225::~ScreenSpi9225(){
     delete gCS;
@@ -74,6 +76,25 @@ ScreenSpi9225::~ScreenSpi9225(){
     delete gRST;
     delete gSPI;
     delete []gFB;
+}
+
+void ScreenSpi9225::image2flow(cv::Mat& in_image, uint16_t* in_str)
+{
+	cv::Mat bgr565Image;
+	cv::cvtColor(in_image, bgr565Image,cv::COLOR_BGR2BGR565);
+
+	uint16_t length;
+	//length = bgr565Image.rows * bgr565Image.cols;
+	//in_str = new uint16_t[length];
+	uint8_t* p_str = (uint8_t*)in_str;
+	for(uint16_t i=0; i<bgr565Image.rows; i++)
+		for(uint16_t j=0; j<bgr565Image.cols; j++)
+		{
+			*p_str = bgr565Image.at<cv::Vec2b>(i, j)[1];
+			p_str++;
+			*p_str = bgr565Image.at<cv::Vec2b>(i, j)[0];
+			p_str++;
+		}
 }
 
 void ScreenSpi9225::writeCommand(unsigned short wr_cmd_a, unsigned short wr_cmd_b) {
@@ -174,10 +195,11 @@ void ScreenSpi9225::initializeLCD() {
 	writeCommand(0x21, 0x0000);
 	writeCommand(0x07, 0x1017);
 	delay(80);
-        cout<<"init LCD parameter finished!";
+        cout<<"init LCD parameter finished!" << endl;
 }
 
 void ScreenSpi9225::ILI9225GclearScreen(unsigned short color) {
+	std::cout << "ClearScreen" << std::endl;
 	int i, j;
 
 	int index=0;	
@@ -220,40 +242,20 @@ void ScreenSpi9225::ILI9225GclearScreen(unsigned short color) {
 
 void ScreenSpi9225::ILI9225GfillRect(int faceId)
 {
-	int x = (WIDTH-FACE_WIDTH)/2;                                                                               
-        int y = (HEIGHT-FACE_HEIGHT)/2;                                                                             
-        int w = FACE_WIDTH;                                                                                         
-        int h = FACE_HEIGHT;                                                                                        
-        int len = FACE_WIDTH*FACE_HEIGHT;                                                                           
-        int i=0;                                                                                                    
-        uint16_t tempBuf[len];
-        memset(gFB, 0, gFBSize);
-        if(faceId == 0)
-        {
-            memcpy(gFB, angryImg.data, len*sizeof(uint16_t));         
-        } else if (faceId == 1)
-        {
-            memcpy(gFB, smileImg.data, len*sizeof(uint16_t));
-        } else if (faceId == 2)
-        {
-            memcpy(gFB, normalImg.data, len*sizeof(uint16_t));
-        }                                                                  
-        for(i=0;i<len;i++)                                                                                          
-        {                                                                                                           
-                uint8_t * p = (uint8_t*)(&gFB[i]);                                                                  
-                p[0] = color>>8;                                                                                    
-                p[1] = color & 0xff;                                                                                
-                                                                                                                    
-        }         
-	ILI9225GflashBuffer(x,y, w,h,gFB,len*sizeof(uint16_t));
+	int x = (WIDTH-FACE_WIDTH)/2;
+	int y = (HEIGHT-FACE_HEIGHT)/2;
+    int w = FACE_WIDTH;
+    int h = FACE_HEIGHT;
+    int len = FACE_WIDTH*FACE_HEIGHT;
+	ILI9225GflashBuffer(x,y, w,h,imagePtr[faceId],len*sizeof(uint16_t));
 }
 void ScreenSpi9225::ILI9225GflashBuffer(int16_t x, int16_t y, 
                                         int16_t w, int16_t h,
-                                        unsigned short * rectbuffer,
+                                        uint16_t* rectbuffer,
                                         int length)
 {
-	unsigned char i, j;
-	int size  = w*h*sizeof(unsigned short);
+	uint16_t i, j;
+	int size  = w*h*sizeof(uint16_t);
 	int numblock = size /  MAXFRAME;
 	int remain = size % MAXFRAME;
 	if(rectbuffer==NULL){
