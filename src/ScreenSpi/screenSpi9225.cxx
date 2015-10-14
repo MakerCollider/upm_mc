@@ -58,10 +58,10 @@ ScreenSpi9225::ScreenSpi9225(int cs, int rs, int rst){
 	}
 	memset(gFB,0,sizeof(uint16_t)*WIDTH*HEIGHT);
     cv::Mat image;
-    image = imread("/usr/share/SmartNode/resource/smile.bmp");
+    image = imread("/usr/share/SmartNode/resource/angry.bmp");
     imagePtr[0] = new uint16_t[image.rows*image.cols];
     image2flow(image, imagePtr[0]);
-    image = imread("/usr/share/SmartNode/resource/angry.bmp");                          
+    image = imread("/usr/share/SmartNode/resource/smile.bmp");                          
     imagePtr[1] = new uint16_t[image.rows*image.cols];
     image2flow(image, imagePtr[1]);
     image = imread("/usr/share/SmartNode/resource/normal.bmp");                          
