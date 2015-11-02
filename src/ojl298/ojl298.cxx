@@ -3,17 +3,18 @@
 
 using namespace upm;
 using namespace std;
+using namespace mraa;
 
 OJL298::OJL298(int pwmA, int dir1)
 {
     pwm = new mraa::Pwm(pwmA);
     if(pwm == NULL)
-        mraa_error(MRAA_ERROR_UNSPECIFIED);
+        mraa_error(mraa::ERROR_UNSPECIFIED);
     pwm->enable(1);
 
     dir = new mraa::Gpio(dir1);
     if(dir == NULL)
-        mraa_error(MRAA_ERROR_UNSPECIFIED);
+        mraa_error(mraa::ERROR_UNSPECIFIED);
     dir->dir(mraa::DIR_OUT);
 
     timeout = 3;
@@ -30,7 +31,7 @@ OJL298::~OJL298()
     delete dir;
 }
 
-void OJL298::mraa_error(mraa_result_t error_code)
+void OJL298::mraa_error(mraa::Result error_code)
 {
     mraa::printError(error_code);
     exit(1);
@@ -55,11 +56,11 @@ void OJL298::setMotion()
         percent = float(speed) / 100.0;
 
         result = pwm->write(percent);
-        if(result != MRAA_SUCCESS)
+        if(result != mraa::SUCCESS)
             mraa_error(result);
 
         result = dir->write(direction);
-        if(result != MRAA_SUCCESS)
+        if(result != mraa::SUCCESS)
             mraa_error(result);
 
         reset_flag = true;

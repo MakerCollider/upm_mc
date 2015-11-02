@@ -20,8 +20,8 @@ namespace upm
         mraa::Gpio* dir;
         pthread_t m_thread;
         bool running, reset_flag;
-        mraa_result_t result;
-        void mraa_error(mraa_result_t error_code);
+        mraa::Result result;
+        void mraa_error(mraa::Result error_code);
 
     public:
         OJL298(int pwm, int dir1);
