@@ -291,8 +291,9 @@ void HD44780::createChar(uint8_t location, uint8_t charmap[])
 
 void HD44780::writeStr(std::string in_string)
 {
+    uint16_t length = (in_string.length()>16)?16:in_string.length();
     std::cout << in_string << std::endl;
-    for(uint16_t i=0; i<in_string.length(); i++)
+    for(uint16_t i=0; i<length; i++)
     {
         write(uint8_t(in_string[i]));
     }
