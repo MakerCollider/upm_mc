@@ -35,7 +35,7 @@ ScreenSpi9225::ScreenSpi9225(int cs, int rs, int rst){
 	//gpio direction
         mraa::Result response;
 	response = gCS->dir(mraa::DIR_OUT);
-        if (response != MRAA_SUCCESS) {
+        if (response != mraa::SUCCESS) {
             mraa::printError(response);
         }
 	gRS->dir(mraa::DIR_OUT);

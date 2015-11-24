@@ -83,7 +83,7 @@ unsigned char Cimg2Base64::base64(cv::Mat* in_rawImage)
 	base64_encodestate es;
 	base64_init_encodestate(&es);
 
-	char *headFmt = "data:image/%s;base64,";
+	const char *headFmt = "data:image/%s;base64,";
 	char *str64 = (char*) malloc(bufferLen * 2 + strlen(headFmt) + 3 + 1);
 	char *p = str64;
 
