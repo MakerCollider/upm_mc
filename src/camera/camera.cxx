@@ -1,5 +1,9 @@
-#include "camera.h"
+#include <iostream>
+#include <sstream>
 #include <pthread.h>
+#include <dirent.h>
+
+#include "camera.h"
 
 using namespace upm;
 
@@ -16,14 +20,52 @@ Camera::~Camera()
     stopCamera();
 }
 
+bool Camera::checkCamera(int in_videoID)
+{
+    DIR *pDir;
+    struct dirent* element = NULL;
+    char videoDir[] = "/sys/class/video4linux";
+
+    std::stringstream fileStream;
+    fileStream << "video" << in_videoID;
+    std::string fileString = fileStream.str();
+
+    pDir=opendir(videoDir);
+    if(pDir == NULL)
+    {
+        std::cout << "Faild to open " << videoDir << std::endl;
+        return false;
+    }
+
+    while( (element=readdir(pDir)) != NULL )
+    {
+        if(!strcmp(fileString.c_str(), element->d_name))
+            return true;
+    }
+
+    closedir(pDir);
+    return false;
+}
+
 void* Camera::grabFunc(void* in_data)
 {
     Camera* in_class = (Camera*)(in_data);
+
     while(in_class->m_running)
     {
-        pthread_mutex_lock(&in_class->m_mutexLock);
-        in_class->m_camera.grab();
-        pthread_mutex_unlock(&in_class->m_mutexLock);
+        if (in_class->checkCamera(in_class->m_cameraId))
+        {
+            pthread_mutex_lock(&in_class->m_mutexLock);
+            in_class->m_camera.grab();
+            pthread_mutex_unlock(&in_class->m_mutexLock);
+        }
+        else
+        {
+            in_class->m_running = false;
+            pthread_mutex_lock(&in_class->m_mutexLock);
+            in_class->m_camera.release();
+            pthread_mutex_lock(&in_class->m_mutexLock);
+        }
     }
 
     std::cout << "Grab thread exit." << std::endl;
@@ -65,7 +107,7 @@ bool Camera::startCamera()
         m_camera.set(cv::CAP_PROP_FRAME_WIDTH, m_width);
         m_camera.set(cv::CAP_PROP_FRAME_HEIGHT, m_height);
         m_running = true;
-	pthread_mutex_init(&m_mutexLock, NULL);
+        pthread_mutex_init(&m_mutexLock, NULL);
         pthread_create(&m_grabThread, NULL, grabFunc, this);
         return true;
     }
@@ -88,7 +130,12 @@ void Camera::stopCamera()
 std::string Camera::read()
 {
     std::string ptrString;
-    m_camera.retrieve(m_rawImage);
-    ptr2String((void*)&m_rawImage, ptrString);
-    return ptrString;
+    if(m_running)
+    {
+        m_camera.retrieve(m_rawImage);
+        ptr2String((void*)&m_rawImage, ptrString);
+        return ptrString;
+    }
+    
+    return "";
 }

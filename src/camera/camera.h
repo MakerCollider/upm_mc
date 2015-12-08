@@ -1,6 +1,5 @@
 #pragma once
 
-#include <iostream>
 #include "opencv2/opencv.hpp"
 
 namespace upm
@@ -27,6 +26,7 @@ namespace upm
         std::string read();
         bool startCamera();
         void stopCamera();
+        bool checkCamera(int in_videoID);
         static void* grabFunc(void* in_data);
     };
 }
