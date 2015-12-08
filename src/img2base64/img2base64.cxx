@@ -62,15 +62,7 @@ unsigned char Cimg2Base64::base64(cv::Mat* in_rawImage)
 	vector<uchar> buffer;
 	vector<int> param;
 
-	std::string str = ".";
-	str += "png";
-	/*
-	if(str == ".jpg") {
-		param.push_back(IMWRITE_JPEG_QUALITY);
-	param.push_back(70);//default(95) 0-100
-	imencode(str.c_str(), *src, buffer, param);
-	} else {
-	*/
+	std::string str = ".png";
 	imencode(str.c_str(), *in_rawImage, buffer);
 
 	int bufferLen = buffer.size();

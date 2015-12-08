@@ -77,16 +77,13 @@ unsigned char CfaceDetect::detect(cv::Mat* in_rawImage)
 	unsigned char result = -1;
 	in_rawImage->copyTo(m_outputImage);
 
-	//进一步缩小图片尺寸，加快运算
 	cv::resize((*in_rawImage),(*m_rawImage),Size(128,96));
 
-	//转换为灰度图，并将直方图均衡化
 	cvtColor((*m_rawImage), grayImage, COLOR_BGR2GRAY);
 	equalizeHist(grayImage, grayImage);
 
 	faces.clear();
 
-	//检测并存储脸的数据
 face_cascade.detectMultiScale(grayImage, faces, 1.1,
 									2, 0|CASCADE_SCALE_IMAGE, Size(30, 30));
 
@@ -96,13 +93,12 @@ face_cascade.detectMultiScale(grayImage, faces, 1.1,
 	}
 	else
 	{
-		unsigned char wScale = m_outputImage.rows / m_rawImage->rows;
-		unsigned char hScale = m_outputImage.cols / m_rawImage->cols;
+		float wScale = double(m_outputImage.cols) / grayImage.cols;
+		float hScale = double(m_outputImage.rows) / grayImage.rows;
 
-		//给每个脸上画一个椭圆
 		for(unsigned int i = 0; i < faces.size(); i++)
 		{
-			Point center((faces[i].x + faces[i].width*0.5)*wScale, (faces[i].y + faces[i].height*0.5)*hScale);
+			Point2f center((faces[i].x + faces[i].width*0.5)*wScale, (faces[i].y + faces[i].height*0.5)*hScale);
 			ellipse(m_outputImage, center, Size( faces[i].width*0.5*wScale, faces[i].height*0.5*hScale),
 					0, 0, 360, Scalar( 255, 0, 255 ), 4, 8, 0);
 		}

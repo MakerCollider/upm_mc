@@ -5,24 +5,28 @@
 
 namespace upm
 {
-	class Camera
-	{
-	public:
-		cv::VideoCapture m_camera;
-		cv::Mat m_rawImage;
-		unsigned char m_cameraId;
-		double m_width;
-		double m_height;
-	public:
-		Camera(unsigned char in_cameraId, double in_width=0, double in_height=0);
-		~Camera();
+    class Camera
+    {
+    public:
+        cv::VideoCapture m_camera;
+        cv::Mat m_rawImage;
+        unsigned char m_cameraId;
+        double m_width;
+        double m_height;
 
-		void ptr2String(void* in_ptr, std::string &in_str);
-		bool string2Ptr(std::string &in_str, void** in_ptr);
+        bool m_running;
+        pthread_t m_grabThread;
+        pthread_mutex_t m_mutexLock;
+    public:
+        Camera(unsigned char in_cameraId, double in_width=0, double in_height=0);
+        ~Camera();
 
-		int* test();
-		std::string read();
-		bool startCamera();
-		void stopCamera();
-	};
+        void ptr2String(void* in_ptr, std::string &in_str);
+        bool string2Ptr(std::string &in_str, void** in_ptr);
+
+        std::string read();
+        bool startCamera();
+        void stopCamera();
+        static void* grabFunc(void* in_data);
+    };
 }

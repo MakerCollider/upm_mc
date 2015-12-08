@@ -1,23 +1,32 @@
 #include "camera.h"
+#include <pthread.h>
 
 using namespace upm;
 
 Camera::Camera(unsigned char in_cameraId, double in_width, double in_height)
 {
-	m_cameraId = in_cameraId;
-	m_width = in_width;
-	m_height = in_height;
+    m_running = false;
+    m_cameraId = in_cameraId;
+    m_width = in_width;
+    m_height = in_height;
 }
 
 Camera::~Camera()
 {
-	stopCamera();
+    stopCamera();
 }
 
-int* Camera::test()
+void* Camera::grabFunc(void* in_data)
 {
-	static int a;
-	return &a;
+    Camera* in_class = (Camera*)(in_data);
+    while(in_class->m_running)
+    {
+        pthread_mutex_lock(&in_class->m_mutexLock);
+        in_class->m_camera.grab();
+        pthread_mutex_unlock(&in_class->m_mutexLock);
+    }
+
+    std::cout << "Grab thread exit." << std::endl;
 }
 
 void Camera::ptr2String(void* in_ptr, std::string &in_str)
@@ -50,26 +59,36 @@ bool Camera::string2Ptr(std::string &in_str, void** in_ptr)
 
 bool Camera::startCamera()
 {
-	m_camera.open(m_cameraId);
-	if(m_camera.isOpened())
-	{
-		m_camera.set(cv::CAP_PROP_FRAME_WIDTH, m_width);
-		m_camera.set(cv::CAP_PROP_FRAME_HEIGHT, m_height);
-		return true;
-	}
-	else
-		return false;
+    m_camera.open(m_cameraId);
+    if(m_camera.isOpened())
+    {
+        m_camera.set(cv::CAP_PROP_FRAME_WIDTH, m_width);
+        m_camera.set(cv::CAP_PROP_FRAME_HEIGHT, m_height);
+        m_running = true;
+	pthread_mutex_init(&m_mutexLock, NULL);
+        pthread_create(&m_grabThread, NULL, grabFunc, this);
+        return true;
+    }
+    else
+        return false;
 }
 
 void Camera::stopCamera()
 {
-	m_camera.release();
+    if(m_running)
+    {
+        m_running = false;
+        void* result;
+        pthread_join(m_grabThread, &result);
+        pthread_mutex_destroy(&m_mutexLock);
+        m_camera.release();
+    }
 }
 
 std::string Camera::read()
 {
-	std::string ptrString;
-	m_camera >> m_rawImage;
-	ptr2String((void*)&m_rawImage, ptrString);
-	return ptrString;
+    std::string ptrString;
+    m_camera.retrieve(m_rawImage);
+    ptr2String((void*)&m_rawImage, ptrString);
+    return ptrString;
 }
