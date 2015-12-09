@@ -101,18 +101,22 @@ bool Camera::string2Ptr(std::string &in_str, void** in_ptr)
 
 bool Camera::startCamera()
 {
-    m_camera.open(m_cameraId);
-    if(m_camera.isOpened())
+    if(m_running != true)
     {
-        m_camera.set(cv::CAP_PROP_FRAME_WIDTH, m_width);
-        m_camera.set(cv::CAP_PROP_FRAME_HEIGHT, m_height);
-        m_running = true;
-        pthread_mutex_init(&m_mutexLock, NULL);
-        pthread_create(&m_grabThread, NULL, grabFunc, this);
-        return true;
+        m_camera.open(m_cameraId);
+        if(m_camera.isOpened())
+        {
+            m_camera.set(cv::CAP_PROP_FRAME_WIDTH, m_width);
+            m_camera.set(cv::CAP_PROP_FRAME_HEIGHT, m_height);
+            m_running = true;
+            pthread_mutex_init(&m_mutexLock, NULL);
+            pthread_create(&m_grabThread, NULL, grabFunc, this);
+        }
+        else
+            return false;
     }
-    else
-        return false;
+
+    return true;
 }
 
 void Camera::stopCamera()
