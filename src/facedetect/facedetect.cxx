@@ -100,7 +100,7 @@ face_cascade.detectMultiScale(grayImage, faces, 1.1,
 		{
 			Point2f center((faces[i].x + faces[i].width*0.5)*wScale, (faces[i].y + faces[i].height*0.5)*hScale);
 			ellipse(m_outputImage, center, Size( faces[i].width*0.5*wScale, faces[i].height*0.5*hScale),
-					0, 0, 360, Scalar( 255, 0, 255 ), 4, 8, 0);
+					0, 0, 360, Scalar( 255, 0, 255 ), 2, cv::LINE_AA, 0);
 		}
 
 		return faces.size();

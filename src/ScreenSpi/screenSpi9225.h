@@ -37,6 +37,7 @@ namespace upm
     public:
         void ILI9225GclearScreen(unsigned short color);
         void ILI9225GfillRect(int faceId);
+        void ILI9225GfillRectA(std::string in_string);
         void ILI9225GflashBuffer(int16_t x, int16_t y, 
                                  int16_t w, int16_t h,
                                  uint16_t* rectbuffer,
@@ -57,7 +58,8 @@ namespace upm
         void writeRegister(unsigned short wr_cmd_a);
         void initializeLCD();
         void delay(unsigned long t);
-	void image2flow(cv::Mat& in_image, uint16_t* in_str);
+        bool string2Ptr(std::string &in_str, void** in_ptr);
+        void image2flow(cv::Mat& in_image, uint16_t* in_str);
         cv::Mat smileImg;
         cv::Mat angryImg;
         cv::Mat normalImg;

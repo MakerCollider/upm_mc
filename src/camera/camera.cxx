@@ -1,7 +1,6 @@
 #include <iostream>
 #include <sstream>
 #include <pthread.h>
-#include <dirent.h>
 
 #include "camera.h"
 
@@ -22,29 +21,32 @@ Camera::~Camera()
 
 bool Camera::checkCamera(int in_videoID)
 {
-    DIR *pDir;
+    bool result = false;
+
+    DIR* videoDirPtr;
+    const char videoDir[] = "/sys/class/video4linux";
     struct dirent* element = NULL;
-    char videoDir[] = "/sys/class/video4linux";
 
     std::stringstream fileStream;
     fileStream << "video" << in_videoID;
     std::string fileString = fileStream.str();
 
-    pDir=opendir(videoDir);
-    if(pDir == NULL)
+    videoDirPtr = opendir(videoDir);
+    if(videoDirPtr == NULL)
     {
-        std::cout << "Faild to open " << videoDir << std::endl;
-        return false;
+        std::cout << "videoDirPtr NULL" << std::endl;
     }
 
-    while( (element=readdir(pDir)) != NULL )
+    while( (element=readdir(videoDirPtr)) != NULL )
     {
-        if(!strcmp(fileString.c_str(), element->d_name))
-            return true;
+        if(strcmp(fileString.c_str(), element->d_name) == 0)
+        {
+            result = true;
+        }
     }
 
-    closedir(pDir);
-    return false;
+    closedir(videoDirPtr);
+    return result;
 }
 
 void* Camera::grabFunc(void* in_data)
@@ -61,6 +63,7 @@ void* Camera::grabFunc(void* in_data)
         }
         else
         {
+            std::cout << "camera error....." << std::endl;
             in_class->m_running = false;
             pthread_mutex_lock(&in_class->m_mutexLock);
             in_class->m_camera.release();

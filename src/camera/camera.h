@@ -1,5 +1,7 @@
 #pragma once
 
+#include <dirent.h>
+
 #include "opencv2/opencv.hpp"
 
 namespace upm
@@ -16,6 +18,7 @@ namespace upm
         bool m_running;
         pthread_t m_grabThread;
         pthread_mutex_t m_mutexLock;
+
     public:
         Camera(unsigned char in_cameraId, double in_width=0, double in_height=0);
         ~Camera();
