@@ -92,6 +92,7 @@ void ScreenSpi9225::image2flow(cv::Mat& in_image, uint16_t* in_str)
     uint8_t* p_str = (uint8_t*)in_str;
     for(uint16_t i=0; i<bgr565Image.rows; i++)
         for(uint16_t j=0; j<bgr565Image.cols; j++)
+        //for(uint16_t j=bgr565Image.cols; j>0; j--)
         {
             *p_str = bgr565Image.at<cv::Vec2b>(i, j)[1];
             p_str++;
