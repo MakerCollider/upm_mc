@@ -26,14 +26,14 @@ set (LIB_INSTALL_DIR "lib${LIB_SUFFIX}" CACHE PATH "Installation path for librar
 include(GNUInstallDirs)
 
 # Make a version file containing the current version from git.
-#include (GetGitRevisionDescription)
-#git_describe (VERSION "--tags")
-#if ("x_${VERSION}" STREQUAL "x_GIT-NOTFOUND")
-#  message (WARNING " - Install git to compile a production UPM!")
-#  set (VERSION "v0.3.1-dirty")
-#endif ()
+include (GetGitRevisionDescription)
+git_describe (VERSION "--tags")
+if ("x_${VERSION}" STREQUAL "x_GIT-NOTFOUND")
+  message (WARNING " - Install git to compile a production UPM!")
+  set (VERSION "v0.0.0-dirty")
+endif ()
 
-set (VERSION "v0.1.0")
+#set (VERSION "v0.1.0")
 message (INFO " - UPM Version ${VERSION}")
 
 #parse the version information into pieces.

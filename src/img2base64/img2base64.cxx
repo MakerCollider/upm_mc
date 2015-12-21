@@ -6,12 +6,65 @@ using namespace cv;
 
 Cimg2Base64::Cimg2Base64()
 {
-
+    m_base64Chars =
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            "abcdefghijklmnopqrstuvwxyz"
+            "0123456789+/";
 }
 
 Cimg2Base64::~Cimg2Base64()
 {
 
+}
+
+std::string Cimg2Base64::base64_encode(unsigned char const* bytes_to_encode, unsigned int in_len)
+{
+    std::string ret;
+    int i = 0;
+    int j = 0;
+    unsigned char char_array_3[3];
+    unsigned char char_array_4[4];
+
+    while (in_len--)
+    {
+        char_array_3[i++] = *(bytes_to_encode++);
+        if (i == 3)
+        {
+            char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
+            char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
+            char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
+            char_array_4[3] = char_array_3[2] & 0x3f;
+
+            for(i = 0; (i <4) ; i++)
+            {
+                ret += m_base64Chars[char_array_4[i]];
+            }
+            i = 0;
+        }
+    }
+
+    if (i)
+    {
+        for(j = i; j < 3; j++)
+            char_array_3[j] = '\0';
+
+        char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
+        char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
+        char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
+        char_array_4[3] = char_array_3[2] & 0x3f;
+
+        for (j = 0; (j < i + 1); j++)
+        {
+            ret += m_base64Chars[char_array_4[j]];
+        }
+
+        while((i++ < 3))
+        {
+            ret += '=';
+        }
+    }
+
+    return ret;
 }
 
 void Cimg2Base64::ptr2String(void* in_ptr, std::string &in_str)
@@ -32,7 +85,7 @@ bool Cimg2Base64::string2Ptr(std::string &in_str, void** in_ptr)
     unsigned long number;
 
     if(in_str.length() <= 7)
-    	return false;
+        return false;
     head.assign(in_str, 0, 7);
     if(head != "Camera:")
         return false;
@@ -44,45 +97,33 @@ bool Cimg2Base64::string2Ptr(std::string &in_str, void** in_ptr)
     return true;
 }
 
-unsigned char Cimg2Base64::noderedBase64(std::string in_ptr)
+bool Cimg2Base64::noderedBase64(std::string in_ptr)
 {
-	unsigned char result;
-	if(string2Ptr(in_ptr, (void**)&m_rawImage))
-	{
-		result = base64(m_rawImage);
-	}
-	else
-		result = -1;
+    unsigned char result;
+    if(string2Ptr(in_ptr, (void**)&m_rawImage))
+    {
+        result = base64(m_rawImage);
+    }
+    else
+        result = false;
 
-	return result;
+    return result;
 }
 
-unsigned char Cimg2Base64::base64(cv::Mat* in_rawImage)
+bool Cimg2Base64::base64(cv::Mat* in_rawImage)
 {
-	vector<uchar> buffer;
-	vector<int> param;
+    vector<uchar> imageVector;
+    cv::imencode(".png", *in_rawImage, imageVector);
+    uint32_t imageVecLength = imageVector.size();
+    uchar *imageBuffer = new uchar[imageVecLength];
+    for(uint32_t i=0; i<imageVecLength; i++)
+    {
+        imageBuffer[i] = imageVector[i];
+    }
 
-	std::string str = ".png";
-	imencode(str.c_str(), *in_rawImage, buffer);
-
-	int bufferLen = buffer.size();
-
-	unsigned char *bufferStr = (uchar*) malloc(bufferLen * 2);
-
-	copy(buffer.begin(), buffer.end(), bufferStr);
-	bufferStr[bufferLen] = '\0';
-
-	base64_encodestate es;
-	base64_init_encodestate(&es);
-
-	const char *headFmt = "data:image/%s;base64,";
-	char *str64 = (char*) malloc(bufferLen * 2 + strlen(headFmt) + 3 + 1);
-	char *p = str64;
-
-	p += sprintf(p, headFmt, "png");
-	p += base64_encode_block((char*)bufferStr, bufferLen, p, &es);
-	p += base64_encode_blockend(p, &es);
-	*p = '\0';
-	m_outputString = str64;
-	return 1;
+    std::string imageString = base64_encode(imageBuffer, imageVecLength);
+    std::string headString = "data:image/png;base64,";
+    m_outputString = headString + imageString;
+    delete imageBuffer;
+    return true;
 }
