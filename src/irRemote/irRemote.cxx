@@ -47,9 +47,8 @@ void* IrRemote::decodeThread(void *cs)
         if(irm->running == 1)
         {
             irm->decodeIr();
-            if(irm->irCode != 0xff00)
+            if(irm->irCode != 0x0000)
             {
-                //这里需要消除抖动
                 cout<<"decodeThread: irCode = " << hex << irm->irCode <<endl;
             }
         } else {
@@ -70,12 +69,13 @@ void IrRemote::decodeIr()
         if(timeDiff > 100000)  //当高电平持续时间超过100ms，表明此时没有按键按下
         {
             pthread_mutex_lock(&m_mutexLock);
-            irCode = 0xff00;
+            irCode = 0x0000;
             pthread_mutex_unlock(&m_mutexLock);
             return;
         }  
     }
     cout<<"decodeIr: dectect button press..."<<endl;
+
     gettimeofday(&m_start,NULL);
     while(!(gpio->read())); //低等待
     gettimeofday(&m_end,NULL);
@@ -102,7 +102,7 @@ void IrRemote::decodeIr()
             gettimeofday(&m_end,NULL);
             timeDiff = time_diff(m_start,m_end);
 
-            if(timeDiff > 260 && timeDiff < 860)//560us
+            if(timeDiff > 160 && timeDiff < 1060)//560us
             {
                 return; 
             }
@@ -116,18 +116,18 @@ char IrRemote::logic_value()
     while(!gpio->read()); //低等待
     //cout<<"logic_value: Get High"<<endl;
     gettimeofday(&m_end,NULL);
-    float timeDiff = time_diff(m_start,m_end);
+    timeDiff = time_diff(m_start,m_end);
     //cout<<"logic_value: Low timeDiff is "<< timeDiff<<endl;
 
-    if(timeDiff > 260 && timeDiff < 860)//低电平560us
+    if(timeDiff > 160 && timeDiff < 1060)//低电平560us
     {
         gettimeofday(&m_start,NULL);
         while(gpio->read());//是高就等待
         gettimeofday(&m_end,NULL);
-        //cout<<"logic_value: High timeDiff is " << timeDiff<< endl; 
         timeDiff = time_diff(m_start,m_end);
+        //cout<<"logic_value: High timeDiff is " << timeDiff<< endl;
 
-        if(timeDiff > 260 && timeDiff < 860)//接着高电平560us
+        if(timeDiff > 160 && timeDiff < 1060)//接着高电平560us
             return 0;
         else if(timeDiff > 1300 && timeDiff < 2100) //接着高电平1.7ms
             return 1;
@@ -144,7 +144,7 @@ void IrRemote::pulse_deal()
         int v = logic_value();
         if(v != 0) //不是0
         {
-            //cout<<"pulse_deal: non zero in 8 zero! index " << i <<endl;    
+            cout<<"pulse_deal: non zero in 8 zero! index " << i <<endl;    
             return;
         }
     }  
@@ -153,20 +153,20 @@ void IrRemote::pulse_deal()
     {
         if(logic_value()!= 1) //不是1
         {
-            //cout<<"pulse_deal: non one in 6 one!"<<endl;    
+            cout<<"pulse_deal: non one in 6 one!"<<endl;    
             return;
         }
     }  
     //执行1个0
     if(logic_value()!= 0) //不是0
     {
-        //cout<<"pulse_deal: non zero in 1 zero!"<<endl;    
+        cout<<"pulse_deal: non zero in 1 zero!"<<endl;    
         return;
     } 
     //执行1个1
     if(logic_value()!= 1) //不是1
     {
-        //cout<<"pulse_deal: non one in 1 one!"<<endl;    
+        cout<<"pulse_deal: non one in 1 one!"<<endl;    
         return;
     } 
     //解析遥控器编码中的command指令
