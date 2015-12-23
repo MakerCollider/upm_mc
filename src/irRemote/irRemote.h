@@ -27,6 +27,7 @@ namespace upm
         IrRemote(int digitalPin);
         ~IrRemote();
 
+        void stopIrRemote();
         unsigned int getIrCode();
         static void* decodeThread(void* cs);
     };

@@ -17,7 +17,6 @@ IrRemote::IrRemote(int digitalPin)
     }
     irCode = 0;
     timeDiff = 0;
-    running = 0;
     pthread_mutex_init(&m_mutexLock, NULL);
     pthread_create(&m_thread, NULL, decodeThread, (void *)this);
     running = 1;
@@ -25,11 +24,7 @@ IrRemote::IrRemote(int digitalPin)
 
 IrRemote::~IrRemote()
 {
-    running = 0;
-    void* result;
-    pthread_join(m_thread, &result);
-    pthread_mutex_destroy(&m_mutexLock);
-    delete gpio;
+    stopIrRemote();
 }
 
 void IrRemote::mraa_error(mraa::Result error_code)
@@ -53,6 +48,7 @@ void* IrRemote::decodeThread(void *cs)
             }
         } else {
             cout<<"decodeThread: stop!"<<endl;
+            break;
         }
     }
     
@@ -74,7 +70,7 @@ void IrRemote::decodeIr()
             return;
         }  
     }
-    cout<<"decodeIr: dectect button press..."<<endl;
+    //cout<<"decodeIr: dectect button press..."<<endl;
 
     gettimeofday(&m_start,NULL);
     while(!(gpio->read())); //低等待
@@ -185,6 +181,19 @@ void IrRemote::pulse_deal()
 unsigned int IrRemote::getIrCode()
 {
     return irCode;
+}
+
+void IrRemote::stopIrRemote()
+{
+    if(running ==1)
+    {
+        cout << "exit..." << endl;
+        running = 0;
+        void* result;
+        pthread_join(m_thread, &result);
+        pthread_mutex_destroy(&m_mutexLock);
+        delete gpio;
+    }
 }
 
 float IrRemote::time_diff(struct timeval start, struct timeval end)
