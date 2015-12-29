@@ -19,5 +19,5 @@
   },
   "license": "MIT",
   "version" : "@upm_VERSION_STRING@",
-  "authors": "See http://github.com/intel-iot-devkit/upm/graphs/contributors"
+  "authors": "MakerCollider SmartNode Team"
 }
