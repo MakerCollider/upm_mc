@@ -4,6 +4,47 @@ Changelog                         {#changelog}
 Here's a list summarizing some of the key undergoing changes to our library
 from earlier versions:
 
+### v0.4.1
+
+ * Over 150 supported sensor drivers including some industrial grade devices
+ * Improved the JAVA bindings, added a large number of examples for sensors,
+ enabled JAVA builds in Travis CI, and introduced automatic loading for the
+ JAVA shared libraries
+ * Continued to improve existing sensor drivers and to enhance them with the
+ new C++ coding style and exception types
+ * Several cmake improvements to allow building on various Linux distributions
+ and with a newer version of Node.JS
+ * Simplified adding and building of C++ sensor examples via cmake
+ * New sensors: micsv89, xbee, urm37, adxrs610, bma220, dfrph, mcp9808, sx1276,
+ groveultrasonic, ozw
+
+### v0.4.0
+
+ * Fully functional and documented JAVA language bindings for sensors with
+ several examples also available
+ * Added standardized exception handling support across all language bindings
+ and updated sensors to use this feature
+ * Sensor drivers are now available and can be installed individually using NPM
+ for Node.js users
+ * Continuous Integration with Travis CI ensures new contributions are built
+ automatically once they are received
+ * API rewrite and improvements for hcsr04, sm130, eboled, loudness
+ * Documentation improvements and code style changes from C to C++
+ * New sensors: hyld9767, mg811, wheelencoder, grovegprs, mpu9250, ssd1306,
+ es9257, lm35, mq4, mq6, mq7, mq8
+
+### v0.3.2
+
+ * Introduced RPM package generation feature from cmake via cpack
+ * Performed a thorough documentation review and merged resulting changes,
+ includes last remaining images and grouping sensors by kits
+ * Added support for Sparkfun Sensor Blocks (OLED & IMU)
+ * Fully reworked API for at42qt1070, mpu9150 and lcd classes, while
+ maintaining backwards compatibility for existing lcd displays.
+ * Extended doxygen tags for better integration with automated documentation
+ generators
+ * New sensors: rgbringcoder, hp20x, pn532, sainsmartks, lsm9ds0, eboled
+
 ### v0.3.1
 
  * Updated index pages for API documentation and cross-linked them

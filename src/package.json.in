@@ -1,9 +1,23 @@
 {
   "name" : "jsupm_@libname@",
+  "description": "Sensor library extension based on MRAA and other third party library that allows you to use various sensors on Intel Edison",
+  "keywords":["intel", "edison", "upmjs", "gpio", "spi", "i2c", "uart", "aio", "sensor", "actuator"],
+  "homepage": "https://github.com/MakerCollider/upm_mc",
   "main" : "./jsupm_@libname@.node",
-  "version" : "@upm_VERSION_STRING@",
+  "repository": {
+  "type": "git",
+  "url": "https://github.com/MakerCollider/upm_mc.git"
+  },
   "engines" : {
     "node": ">= 0.10.x"
   },
-  "license": "MIT"
+  "bugs": {
+    "url" : "https://github.com/MakerCollider/upm_mc/issues"
+  },
+  "dependencies": {
+  "mraa": ">=@MRAA_VERSION@"
+  },
+  "license": "MIT",
+  "version" : "@upm_VERSION_STRING@",
+  "authors": "See http://github.com/intel-iot-devkit/upm/graphs/contributors"
 }
