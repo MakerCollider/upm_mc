@@ -2,9 +2,9 @@
 
 function read_dir(){
     pushd $1
-    for file in `ls $1`
+    for file in `ls ./`
     do
-        if [ -d $1"/"$file ] 
+        if [ -d $file ] 
         then
             if [ "$file" != "CMakeFiles" ]
             then
