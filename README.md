@@ -13,5 +13,5 @@ Typically a sensor is represented as a class and instantiated.
 
 To install a UPM module using npm simply type:
 
-npm install jsupm_<module-name>
+npm install jsupm_\<module-name\>
 
