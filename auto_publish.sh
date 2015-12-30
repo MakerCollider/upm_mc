@@ -1,17 +1,20 @@
 #! /bin/bash
+
 function read_dir(){
+    pushd $1
     for file in `ls $1`
     do
         if [ -d $1"/"$file ] 
         then
             if [ "$file" != "CMakeFiles" ]
             then
-                cd $file
+                pushd $file
                 npm publish ./
-                cd ../
+                popd
             fi
         fi
     done
+    popd
 }
 
 read_dir $1
