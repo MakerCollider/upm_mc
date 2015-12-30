@@ -158,6 +158,9 @@ if (SWIG_FOUND)
         configure_file (${PROJECT_SOURCE_DIR}/src/npmignore.in ${CMAKE_CURRENT_BINARY_DIR}/.npmignore @ONLY)
         install(FILES ${CMAKE_CURRENT_BINARY_DIR}/.npmignore                                                   
             DESTINATION lib/node_modules/jsupm_${libname} COMPONENT ${libname}) 
+        configure_file (${PROJECT_SOURCE_DIR}/src/README.md.in ${CMAKE_CURRENT_BINARY_DIR}/README.md @ONLY)                     
+        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/README.md                                                     
+            DESTINATION lib/node_modules/jsupm_${libname} COMPONENT ${libname}) 
     endmacro()
 
   endif(BUILDSWIGNODE)
