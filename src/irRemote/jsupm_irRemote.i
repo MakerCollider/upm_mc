@@ -1,8 +1,8 @@
-%module jsupm_irRemote
+%module jsupm_irremote
 %include "../upm.i"
 
 %{
-    #include "irRemote.h"
+    #include "irremote.h"
 %}
 
-%include "irRemote.h"
+%include "irremote.h"

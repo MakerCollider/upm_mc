@@ -1,9 +1,9 @@
-%module pyupm_irRemote
+%module pyupm_irremote
 %include "../upm.i"
 
 %feature("autodoc", "3");
 
-%include "irRemote.h"
+%include "irremote.h"
 %{
-    #include "irRemote.h"
+    #include "irremote.h"
 %}

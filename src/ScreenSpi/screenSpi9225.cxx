@@ -6,7 +6,7 @@
 */
 
 
-#include "screenSpi9225.h"
+#include "screenspi9225.h"
 using namespace cv;
 using namespace mraa;
 using namespace upm;

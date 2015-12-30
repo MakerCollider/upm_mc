@@ -1,8 +1,8 @@
-%module jsupm_screenSpi9225
+%module jsupm_screenspi9225
 %include "../upm.i"
 
 %{
-    #include "screenSpi9225.h"
+    #include "screenspi9225.h"
 %}
 
-%include "screenSpi9225.h"
+%include "screenspi9225.h"

@@ -1,5 +1,5 @@
 #include <iostream>
-#include "irRemote.h"
+#include "irremote.h"
 
 using namespace upm;
 using namespace std;
