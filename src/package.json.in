@@ -15,7 +15,7 @@
     "url" : "https://github.com/MakerCollider/upm_mc/issues"
   },
   "dependencies": {
-  "mraa": ">=@MRAA_VERSION@"
+  "mraa-makercollider": ">=0.0.3"
   },
   "license": "MIT",
   "version" : "@upm_VERSION_STRING@",
