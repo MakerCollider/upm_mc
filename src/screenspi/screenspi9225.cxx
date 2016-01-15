@@ -59,18 +59,9 @@ ScreenSpi9225::ScreenSpi9225(int cs, int rs, int rst)
     }
     memset(gFB,0,sizeof(uint16_t)*SCREEN_WIDTH*SCREEN_HEIGHT);
 
-    /*
-    cv::Mat image;
-    image = imread("/usr/share/SmartNode/resource/angry.bmp");
-    imagePtr[0] = new uint16_t[image.rows*image.cols];
-    image2flow(image, imagePtr[0]);
-    image = imread("/usr/share/SmartNode/resource/smile.bmp");                          
-    imagePtr[1] = new uint16_t[image.rows*image.cols];
-    image2flow(image, imagePtr[1]);
-    image = imread("/usr/share/SmartNode/resource/normal.bmp");                          
-    imagePtr[2] = new uint16_t[image.rows*image.cols]; 
-    image2flow(image, imagePtr[2]);
-    */
+    setImage("/usr/share/SmartNode/resource/angry.bmp", 100);
+    setImage("/usr/share/SmartNode/resource/smile.bmp", 101);
+    setImage("/usr/share/SmartNode/resource/normal.bmp", 102);
 
     cout << "init finished!" << endl;
 }

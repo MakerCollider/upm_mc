@@ -69,7 +69,6 @@ namespace upm
         mraa::Gpio* gRST;
         mraa::Spi* gSPI;
         uint16_t *gFB;
-        uint16_t *imagePtr[3];
         std::map<int, ImageData> imageMap;
         unsigned long gFBSize;
         void mraa_error(mraa_result_t error_code);
