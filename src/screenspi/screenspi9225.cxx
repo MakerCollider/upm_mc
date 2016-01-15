@@ -58,6 +58,8 @@ ScreenSpi9225::ScreenSpi9225(int cs, int rs, int rst)
         delete gSPI;
     }
     memset(gFB,0,sizeof(uint16_t)*SCREEN_WIDTH*SCREEN_HEIGHT);
+
+    /*
     cv::Mat image;
     image = imread("/usr/share/SmartNode/resource/angry.bmp");
     imagePtr[0] = new uint16_t[image.rows*image.cols];
@@ -68,6 +70,7 @@ ScreenSpi9225::ScreenSpi9225(int cs, int rs, int rst)
     image = imread("/usr/share/SmartNode/resource/normal.bmp");                          
     imagePtr[2] = new uint16_t[image.rows*image.cols]; 
     image2flow(image, imagePtr[2]);
+    */
 
     cout << "init finished!" << endl;
 }
@@ -212,7 +215,6 @@ void ScreenSpi9225::initializeLCD()
 
 void ScreenSpi9225::ILI9225GclearScreen(unsigned short color)
 {
-    std::cout << "ClearScreen" << std::endl;
     int i, j;
 
     int index=0;    
@@ -276,44 +278,75 @@ bool ScreenSpi9225::string2Ptr(std::string &in_str, void** in_ptr)
     return true;
 }
 
-void ScreenSpi9225::ILI9225GfillRect(int faceId)
+void ScreenSpi9225::ILI9225GflashBuffer(ImageData in_imageData)
 {
-    int x = (SCREEN_WIDTH - FACE_WIDTH)/2;
-    int y = (SCREEN_HEIGHT - FACE_HEIGHT)/2;
-    int w = FACE_WIDTH;
-    int h = FACE_HEIGHT;
-    int len = FACE_WIDTH*FACE_HEIGHT;
-    ILI9225GflashBuffer(x,y, w,h,imagePtr[faceId],len*sizeof(uint16_t));
+    ILI9225GflashBuffer(in_imageData.topLeftX, in_imageData.topLeftY,
+        in_imageData.width, in_imageData.height, in_imageData.data, in_imageData.length);
+}
+
+ScreenSpi9225::ImageData ScreenSpi9225::mat2ImageData(cv::InputArray in_mat)
+{
+    double times;
+    cv::Mat image = in_mat.getMat();
+    ImageData imageData;
+
+    if(image.cols > SCREEN_WIDTH)
+    {
+            times = SCREEN_WIDTH / double(image.cols);
+            cv::resize(image, image, cv::Size(SCREEN_WIDTH, image.rows*times));
+    }
+
+    if(image.rows > SCREEN_HEIGHT)
+    {
+        times = SCREEN_HEIGHT / double(image.rows);
+        cv::resize(image, image, cv::Size(image.cols*times, SCREEN_HEIGHT));
+    }
+
+    imageData.topLeftX = (SCREEN_WIDTH - image.cols)/2;
+    imageData.topLeftY = (SCREEN_HEIGHT - image.rows)/2;
+    imageData.height = image.rows;
+    imageData.width = image.cols;
+    imageData.length = static_cast<uint32_t>(image.rows*image.cols*sizeof(uint16_t));
+    imageData.data = new uint16_t[imageData.length];
+    image2flow(image, imageData.data);
+    return imageData;
+}
+
+ScreenSpi9225::ScreenError ScreenSpi9225::setImage(std::string in_string, int in_index)
+{
+    
+    cv::Mat image;
+    ScreenSpi9225::ImageData imageData;
+
+    image = imread(in_string);
+    if(image.data == NULL)
+    {
+        return IMAGE_PATH_ERROR;
+    }
+    else
+    {
+        imageMap[in_index] = mat2ImageData(image);
+    }
+    
+    return SUCCESS;
+}
+
+void ScreenSpi9225::ILI9225GfillRect(int in_index)
+{
+    ILI9225GclearScreen(0);
+    ILI9225GflashBuffer(imageMap[in_index]);
 }
 
 void ScreenSpi9225::ILI9225GfillRectA(std::string in_string)
 {
-    double times;
     cv::Mat* imagePtr;
-    uint16_t *imageFlow;
+    ImageData imageData;
     
     if(string2Ptr(in_string, (void**)&imagePtr))
     {
-        if(imagePtr->cols > SCREEN_WIDTH)
-        {
-            times = SCREEN_WIDTH / double(imagePtr->cols);
-            cv::resize(*imagePtr, *imagePtr, cv::Size(SCREEN_WIDTH, imagePtr->rows*times));
-        }
-
-        if(imagePtr->rows > SCREEN_HEIGHT)
-        {
-            times = SCREEN_HEIGHT / double(imagePtr->rows);
-            cv::resize(*imagePtr, *imagePtr, cv::Size(imagePtr->cols*times, SCREEN_HEIGHT));
-        }
-
-        int topLeftX = (SCREEN_WIDTH - imagePtr->cols)/2;
-        int topLeftY = (SCREEN_HEIGHT - imagePtr->rows)/2;
-        int len = imagePtr->cols * imagePtr->rows;
-        imageFlow = new uint16_t[len];
-        image2flow(*imagePtr, imageFlow);
-        ILI9225GflashBuffer(topLeftX, topLeftY, imagePtr->cols,
-            imagePtr->rows, imageFlow, len*sizeof(uint16_t));
-        delete imageFlow;
+        imageData = mat2ImageData(*imagePtr);
+        ILI9225GflashBuffer(imageData);
+        delete imageData.data;
     }
 }
 

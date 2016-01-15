@@ -70,8 +70,6 @@ void* Camera::grabFunc(void* in_data)
             pthread_mutex_lock(&in_class->m_mutexLock);
         }
     }
-
-    std::cout << "Grab thread exit." << std::endl;
 }
 
 void Camera::ptr2String(void* in_ptr, std::string &in_str)

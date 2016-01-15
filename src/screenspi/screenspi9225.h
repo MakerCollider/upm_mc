@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <iostream>
+#include <map>
 #include "opencv2/core/core.hpp"
 #include "opencv2/objdetect/objdetect.hpp"
 #include "opencv2/highgui/highgui.hpp"
@@ -35,13 +36,32 @@ namespace upm
     class ScreenSpi9225
     {
     public:
+        enum ScreenError
+        {
+            SUCCESS,
+            IMAGE_PATH_ERROR,
+            IMAGE_EXIST
+        };
+
+        struct ImageData
+        {
+            uint16_t topLeftX;
+            uint16_t topLeftY;
+            uint16_t height;
+            uint16_t width;
+            uint16_t* data;
+            uint32_t length;
+        };
+    public:
         void ILI9225GclearScreen(unsigned short color);
-        void ILI9225GfillRect(int faceId);
+        void ILI9225GfillRect(int in_index);
         void ILI9225GfillRectA(std::string in_string);
+        void ILI9225GflashBuffer(ImageData in_imageData);
         void ILI9225GflashBuffer(int16_t x, int16_t y, 
                                  int16_t w, int16_t h,
                                  uint16_t* rectbuffer,
                                  int length);
+        ScreenError setImage(std::string in_string, int in_index);
 
     private:
         mraa::Gpio* gCS;
@@ -50,6 +70,7 @@ namespace upm
         mraa::Spi* gSPI;
         uint16_t *gFB;
         uint16_t *imagePtr[3];
+        std::map<int, ImageData> imageMap;
         unsigned long gFBSize;
         void mraa_error(mraa_result_t error_code);
         void writeCommand(unsigned short wr_cmd_a, unsigned short wr_cmd_b);
@@ -60,6 +81,7 @@ namespace upm
         void delay(unsigned long t);
         bool string2Ptr(std::string &in_str, void** in_ptr);
         void image2flow(cv::Mat& in_image, uint16_t* in_str);
+        ImageData mat2ImageData(cv::InputArray in_mat);
         cv::Mat smileImg;
         cv::Mat angryImg;
         cv::Mat normalImg;
