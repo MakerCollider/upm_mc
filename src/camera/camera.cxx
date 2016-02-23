@@ -1,5 +1,6 @@
 #include <iostream>
 #include <sstream>
+#include <unistd.h>
 #include <pthread.h>
 
 #include "camera.h"
@@ -143,4 +144,18 @@ std::string Camera::read()
     }
     
     return "";
+}
+
+std::string Camera::shoot()
+{
+    std::string ptrString;
+    if(m_running)
+    {
+        m_camera.retrieve(m_rawImage);
+        imwrite("/home/root/shoot.png", m_rawImage);
+        ptr2String((void*)&m_rawImage, ptrString);
+        return ptrString;
+    }                                   
+ 
+    return "";  
 }

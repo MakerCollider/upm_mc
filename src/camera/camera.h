@@ -27,6 +27,7 @@ namespace upm
         bool string2Ptr(std::string &in_str, void** in_ptr);
 
         std::string read();
+        std::string shoot();
         bool startCamera();
         void stopCamera();
         bool checkCamera(int in_videoID);
