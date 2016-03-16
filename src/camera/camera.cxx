@@ -106,6 +106,7 @@ bool Camera::startCamera()
     if(m_running != true)
     {
         m_camera.open(m_cameraId);
+        sleep(1);
         if(m_camera.isOpened())
         {
             m_camera.set(cv::CAP_PROP_FRAME_WIDTH, m_width);
@@ -130,6 +131,7 @@ void Camera::stopCamera()
         pthread_join(m_grabThread, &result);
         pthread_mutex_destroy(&m_mutexLock);
         m_camera.release();
+        sleep(1);
     }
 }
 
