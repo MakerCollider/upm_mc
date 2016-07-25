@@ -121,7 +121,7 @@ void ScreenSpi9225::writeDataFast(unsigned short wr_cmd_a)
     uint8_t *p = (uint8_t*)(&cmd);
     p[0] = wr_cmd_a >> 8;
     p[1] = wr_cmd_a & 0xff;
-    gSPI->write_word(&cmd, 2);
+    gSPI->writeWord(&cmd, 2);
 
 }
 
