@@ -251,19 +251,17 @@ void ScreenSpi9225::ILI9225GclearScreen(unsigned short color)
 
 bool ScreenSpi9225::string2Ptr(std::string &in_str, void** in_ptr)
 {
-    static std::string head;
-    std::string strCut;
-    std::istringstream strStream;
-    unsigned long number;
+    //static std::string head;
+    //static std::string strCut;
+    static std::istringstream strStream;
+    static unsigned long long number;
 
-    if(in_str.length() <= 7)
-        return false;
-    head.assign(in_str, 0, 7);
-    if(head != "Camera:")
-        return false;
+    // head.assign(in_str, 0, 7);
+    // if(head != "Camera:")
+    //     return false;
 
-    strCut.assign(in_str, 7, in_str.length());
-    strStream.str(strCut);
+    // strCut.assign(in_str, 7, in_str.length());
+    strStream.str(in_str);
     strStream >> number;
     *in_ptr = (void*)(number);
     return true;
